@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>지뢰찾기</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #setup {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 60px;
+            padding: 5px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #board {
+            display: inline-grid;
+            gap: 1px;
+            background-color: #bdbdbd;
+            padding: 1px;
+            border: 2px solid #7b7b7b;
+            border-radius: 4px;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: #c0c0c0;
+            border: 1px outset #ffffff;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        .cell:active {
+            border: 1px inset #ffffff;
+        }
+        .revealed {
+            background-color: #e0e0e0;
+            border: 1px solid #bdbdbd;
+        }
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="setup">
+            <input type="number" id="width" placeholder="가로" min="5" max="30" value="10">
+            <input type="number" id="height" placeholder="세로" min="5" max="30" value="10">
+            <input type="number" id="mines" placeholder="폭탄 수" min="1" value="15">
+            <button onclick="startGame()">게임 시작</button>
+        </div>
+        <div id="board"></div>
+        <div id="game-info">
+            <div id="mine-count">남은 지뢰: 15</div>
+            <div id="timer">시간: 0초</div>
+        </div>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const mineCountDisplay = document.getElementById('mine-count');
+        const timerDisplay = document.getElementById('timer');
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const minesInput = document.getElementById('mines');
+        let width, height, mineCount;
+        let cells = [];
+        let minePositions = [];
+        let gameStarted = false;
+        let timerInterval;
+        let secondsElapsed = 0;
+
+        function updateMineCount() {
+            const w = parseInt(widthInput.value);
+            const h = parseInt(heightInput.value);
+            if (!isNaN(w) && !isNaN(h)) {
+                const recommendedMines = Math.floor(w * h * 0.15);
+                minesInput.value = recommendedMines;
+            }
+        }
+
+        widthInput.addEventListener('input', updateMineCount);
+        heightInput.addEventListener('input', updateMineCount);
+
+        function startGame() {
+            width = parseInt(widthInput.value);
+            height = parseInt(heightInput.value);
+            mineCount = parseInt(minesInput.value);
+            
+            if (isNaN(width) || isNaN(height) || isNaN(mineCount) || 
+                width < 5 || height < 5 || width > 30 || height > 30 || 
+                mineCount < 1 || mineCount >= width * height) {
+                alert('올바른 값을 입력해주세요. (가로/세로: 5-30, 폭탄 수: 1 이상, 총 셀 수 미만)');
+                return;
+            }
+
+            cells = [];
+            minePositions = [];
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${width}, 30px)`;
+            mineCountDisplay.textContent = `남은 지뢰: ${mineCount}`;
+            gameStarted = true;
+            secondsElapsed = 0;
+            updateTimer();
+            startTimer();
+
+            createBoard();
+            placeMines();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                updateTimer();
+            }, 1000);
+        }
+
+        function updateTimer() {
+            timerDisplay.textContent = `시간: ${secondsElapsed}초`;
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function createBoard() {
+            for (let i = 0; i < width * height; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', revealCell);
+                cell.addEventListener('contextmenu', flagCell);
+                board.appendChild(cell);
+                cells.push(cell);
+            }
+        }
+
+        function placeMines() {
+            while (minePositions.length < mineCount) {
+                const position = Math.floor(Math.random() * (width * height));
+                if (!minePositions.includes(position)) {
+                    minePositions.push(position);
+                }
+            }
+        }
+
+        function countAdjacentMines(index) {
+            const row = Math.floor(index / width);
+            const col = index % width;
+            let count = 0;
+
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const newRow = row + i;
+                    const newCol = col + j;
+                    if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                        const newIndex = newRow * width + newCol;
+                        if (minePositions.includes(newIndex)) {
+                            count++;
+                        }
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        function revealCell(event) {
+            if (!gameStarted) return;
+            const cell = event.target;
+            const index = parseInt(cell.dataset.index);
+            
+            if (cell.classList.contains('revealed') || cell.textContent === '🚩') {
+                return;
+            }
+
+            cell.classList.add('revealed');
+
+            if (minePositions.includes(index)) {
+                cell.textContent = '💣';
+                cell.style.backgroundColor = 'red';
+                gameOver(false);
+            } else {
+                const count = countAdjacentMines(index);
+                if (count === 0) {
+                    cell.textContent = '';
+                    revealAdjacentCells(index);
+                } else {
+                    cell.textContent = count;
+                    cell.style.color = getNumberColor(count);
+                }
+                checkWin();
+            }
+        }
+
+        function revealAdjacentCells(index) {
+            const row = Math.floor(index / width);
+            const col = index % width;
+
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const newRow = row + i;
+                    const newCol = col + j;
+                    if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                        const newIndex = newRow * width + newCol;
+                        const cell = cells[newIndex];
+                        if (!cell.classList.contains('revealed')) {
+                            revealCell({ target: cell });
+                        }
+                    }
+                }
+            }
+        }
+
+        function flagCell(event) {
+            if (!gameStarted) return;
+            event.preventDefault();
+            const cell = event.target;
+            
+            if (!cell.classList.contains('revealed')) {
+                if (cell.textContent === '🚩') {
+                    cell.textContent = '';
+                    mineCount++;
+                } else {
+                    cell.textContent = '🚩';
+                    mineCount--;
+                }
+                mineCountDisplay.textContent = `남은 지뢰: ${mineCount}`;
+            }
+        }
+
+        function gameOver(isWin) {
+            gameStarted = false;
+            stopTimer();
+            cells.forEach((cell, index) => {
+                if (minePositions.includes(index)) {
+                    cell.textContent = '💣';
+                }
+                cell.removeEventListener('click', revealCell);
+                cell.removeEventListener('contextmenu', flagCell);
+            });
+            const status = isWin ? '승리!' : '게임 오버!';
+            const color = isWin ? 'green' : 'red';
+            mineCountDisplay.textContent = `${status} (${secondsElapsed}초)`;
+            mineCountDisplay.style.color = color;
+        }
+
+        function checkWin() {
+            const revealedCount = cells.filter(cell => cell.classList.contains('revealed')).length;
+            if (revealedCount === width * height - mineCount) {
+                gameOver(true);
+            }
+        }
+
+        function getNumberColor(num) {
+            const colors = ['#1976D2', '#388E3C', '#D32F2F', '#7B1FA2', '#FF8F00', '#0097A7', '#424242', '#9E9E9E'];
+            return colors[num - 1] || 'black';
+        }
+
+        // 초기 게임 설정
+        updateMineCount();
+    </script>
+</body>
+</html>
