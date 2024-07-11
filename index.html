@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지뢰찾기</title>
     <style>
         body {
@@ -23,14 +24,18 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 95vw;
         }
         #setup {
             margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         input {
             width: 60px;
             padding: 5px;
-            margin-right: 10px;
+            margin: 5px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
@@ -42,6 +47,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin: 5px;
         }
         button:hover {
             background-color: #45a049;
@@ -55,12 +61,9 @@
             border-radius: 4px;
         }
         .cell {
-            width: 30px;
-            height: 30px;
             background-color: #c0c0c0;
             border: 1px outset #ffffff;
             text-align: center;
-            line-height: 30px;
             font-weight: bold;
             cursor: pointer;
             user-select: none;
@@ -77,9 +80,8 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 300px;
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
         }
     </style>
@@ -140,8 +142,6 @@
             cells = [];
             minePositions = [];
             board.innerHTML = '';
-            board.style.gridTemplateColumns = `repeat(${width}, 30px)`;
-            mineCountDisplay.textContent = `남은 지뢰: ${mineCount}`;
             gameStarted = true;
             secondsElapsed = 0;
             updateTimer();
@@ -149,6 +149,7 @@
 
             createBoard();
             placeMines();
+            adjustCellSize();
         }
 
         function startTimer() {
@@ -168,6 +169,7 @@
         }
 
         function createBoard() {
+            board.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
             for (let i = 0; i < width * height; i++) {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
@@ -179,6 +181,18 @@
             }
         }
 
+        function adjustCellSize() {
+            const gameContainer = document.getElementById('game-container');
+            const availableWidth = gameContainer.clientWidth - 40; // 40px for padding
+            const cellSize = Math.floor(availableWidth / width);
+            cells.forEach(cell => {
+                cell.style.width = `${cellSize}px`;
+                cell.style.height = `${cellSize}px`;
+                cell.style.lineHeight = `${cellSize}px`;
+                cell.style.fontSize = `${Math.max(cellSize / 2, 12)}px`;
+            });
+        }
+
         function placeMines() {
             while (minePositions.length < mineCount) {
                 const position = Math.floor(Math.random() * (width * height));
@@ -186,6 +200,7 @@
                     minePositions.push(position);
                 }
             }
+            mineCountDisplay.textContent = `남은 지뢰: ${mineCount}`;
         }
 
         function countAdjacentMines(index) {
@@ -303,6 +318,9 @@
 
         // 초기 게임 설정
         updateMineCount();
+
+        // 화면 크기 변경 시 셀 크기 조정
+        window.addEventListener('resize', adjustCellSize);
     </script>
 </body>
 </html>
