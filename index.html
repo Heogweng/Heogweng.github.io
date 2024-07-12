@@ -5,85 +5,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지뢰찾기</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            color: #333;
-        }
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 95vw;
-        }
-        #setup {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        input {
-            width: 60px;
-            padding: 5px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            padding: 8px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin: 5px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        #board {
-            display: inline-grid;
-            gap: 1px;
-            background-color: #bdbdbd;
-            padding: 1px;
-            border: 2px solid #7b7b7b;
-            border-radius: 4px;
-        }
-        .cell {
-            background-color: #c0c0c0;
-            border: 1px outset #ffffff;
-            text-align: center;
-            font-weight: bold;
-            cursor: pointer;
-            user-select: none;
-            transition: background-color 0.2s;
-        }
-        .cell:active {
-            border: 1px inset #ffffff;
-        }
-        .revealed {
-            background-color: #e0e0e0;
-            border: 1px solid #bdbdbd;
-        }
-        #game-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    #game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        max-width: 95vw;
+    }
+    #setup {
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    input {
+        width: 60px;
+        padding: 5px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    button {
+        padding: 8px 15px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin: 5px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    #board {
+        display: inline-grid;
+        gap: 1px;
+        background-color: #bdbdbd;
+        padding: 1px;
+        border: 2px solid #7b7b7b;
+        border-radius: 4px;
+    }
+    .cell {
+        background-color: #c0c0c0;
+        border: 1px outset #ffffff;
+        text-align: center;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.2s;
+    }
+    .cell:active {
+        border: 1px inset #ffffff;
+    }
+    .revealed {
+        background-color: #e0e0e0;
+        border: 1px solid #bdbdbd;
+    }
+    #game-info {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 20px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    #victory-message {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    #victory-message .content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        transform: scale(0.1);
+        transition: transform 0.5s ease-in-out;
+    }
+
+    #victory-message h2 {
+        color: #4CAF50;
+        margin-bottom: 10px;
+    }
+
+    #victory-message p {
+        font-size: 18px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    @keyframes confetti {
+        0% { transform: translateY(0) rotateZ(0); opacity: 1; }
+        100% { transform: translateY(1000px) rotateZ(720deg); opacity: 0; }
+    }
+
+    #restart-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    #restart-button:hover {
+        background-color: #45a049;
+    }
+
     </style>
 </head>
 <body>
@@ -99,228 +157,416 @@
             <div id="mine-count">남은 지뢰: 15</div>
             <div id="timer">시간: 0초</div>
         </div>
+
+        <div id="victory-message" class="hidden">
+            <div class="content">
+                <h2>게임 클리어!</h2>
+                <p>경과 시간: <span id="final-time"></span>초</p>
+                <button id="restart-button">다시 시작</button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        const board = document.getElementById('board');
-        const mineCountDisplay = document.getElementById('mine-count');
-        const timerDisplay = document.getElementById('timer');
-        const widthInput = document.getElementById('width');
-        const heightInput = document.getElementById('height');
-        const minesInput = document.getElementById('mines');
-        let width, height, mineCount;
-        let cells = [];
-        let minePositions = [];
-        let gameStarted = false;
-        let timerInterval;
-        let secondsElapsed = 0;
+<script>
+    const board = document.getElementById('board');
+    const mineCountDisplay = document.getElementById('mine-count');
+    const timerDisplay = document.getElementById('timer');
+    const widthInput = document.getElementById('width');
+    const heightInput = document.getElementById('height');
+    const minesInput = document.getElementById('mines');
+    // let width, height, mineCount;
+    let width, height, mineCount, originalMineCount;
+    let cells = [];
+    let minePositions = [];
+    let gameStarted = false;
+    let timerInterval;
+    let secondsElapsed = 0;
 
-        function updateMineCount() {
-            const w = parseInt(widthInput.value);
-            const h = parseInt(heightInput.value);
-            if (!isNaN(w) && !isNaN(h)) {
-                const recommendedMines = Math.floor(w * h * 0.15);
-                minesInput.value = recommendedMines;
-            }
+    function updateMineCount() {
+        const w = parseInt(widthInput.value);
+        const h = parseInt(heightInput.value);
+        if (!isNaN(w) && !isNaN(h)) {
+            const recommendedMines = Math.floor(w * h * 0.15);
+            minesInput.value = recommendedMines;
+        }
+    }
+
+    widthInput.addEventListener('input', updateMineCount);
+    heightInput.addEventListener('input', updateMineCount);
+
+    function startGame() {
+        width = parseInt(widthInput.value);
+        height = parseInt(heightInput.value);
+        mineCount = parseInt(minesInput.value);
+        originalMineCount = mineCount;
+
+        if (isNaN(width) || isNaN(height) || isNaN(mineCount) || 
+            width < 5 || height < 5 || width > 30 || height > 30 || 
+            mineCount < 1 || mineCount >= width * height) {
+            alert('올바른 값을 입력해주세요. (가로/세로: 5-30, 폭탄 수: 1 이상, 총 셀 수 미만)');
+            return;
         }
 
-        widthInput.addEventListener('input', updateMineCount);
-        heightInput.addEventListener('input', updateMineCount);
+        cells = [];
+        minePositions = [];
+        board.innerHTML = '';
+        gameStarted = true;
+        secondsElapsed = 0;
+        updateTimer();
+        startTimer();
 
-        function startGame() {
-            width = parseInt(widthInput.value);
-            height = parseInt(heightInput.value);
-            mineCount = parseInt(minesInput.value);
-            
-            if (isNaN(width) || isNaN(height) || isNaN(mineCount) || 
-                width < 5 || height < 5 || width > 30 || height > 30 || 
-                mineCount < 1 || mineCount >= width * height) {
-                alert('올바른 값을 입력해주세요. (가로/세로: 5-30, 폭탄 수: 1 이상, 총 셀 수 미만)');
-                return;
-            }
+        createBoard();
+        placeMines();
+        adjustCellSize();
+    }
 
-            cells = [];
-            minePositions = [];
-            board.innerHTML = '';
-            gameStarted = true;
-            secondsElapsed = 0;
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
             updateTimer();
-            startTimer();
+        }, 1000);
+    }
 
-            createBoard();
-            placeMines();
-            adjustCellSize();
+    function updateTimer() {
+        timerDisplay.textContent = `시간: ${secondsElapsed}초`;
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+
+    function createBoard() {
+        board.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+        for (let i = 0; i < width * height; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.dataset.index = i;
+            cell.addEventListener('click', revealCell);
+            cell.addEventListener('contextmenu', flagCell);
+            board.appendChild(cell);
+            cells.push(cell);
         }
+    }
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                secondsElapsed++;
-                updateTimer();
-            }, 1000);
+    function adjustCellSize() {
+        const gameContainer = document.getElementById('game-container');
+        const availableWidth = gameContainer.clientWidth - 40; // 40px for padding
+        const cellSize = Math.floor(availableWidth / width);
+        cells.forEach(cell => {
+            cell.style.width = `${cellSize}px`;
+            cell.style.height = `${cellSize}px`;
+            cell.style.lineHeight = `${cellSize}px`;
+            cell.style.fontSize = `${Math.max(cellSize / 2, 12)}px`;
+        });
+    }
+
+    function placeMines() {
+        while (minePositions.length < mineCount) {
+            const position = Math.floor(Math.random() * (width * height));
+            if (!minePositions.includes(position)) {
+                minePositions.push(position);
+            }
         }
+        mineCountDisplay.textContent = `남은 지뢰: ${mineCount}`;
+    }
 
-        function updateTimer() {
-            timerDisplay.textContent = `시간: ${secondsElapsed}초`;
-        }
+    function countAdjacentMines(index) {
+        const row = Math.floor(index / width);
+        const col = index % width;
+        let count = 0;
 
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-
-        function createBoard() {
-            board.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
-            for (let i = 0; i < width * height; i++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.dataset.index = i;
-                cell.addEventListener('click', revealCell);
-                cell.addEventListener('contextmenu', flagCell);
-                board.appendChild(cell);
-                cells.push(cell);
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                const newRow = row + i;
+                const newCol = col + j;
+                if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                    const newIndex = newRow * width + newCol;
+                    if (minePositions.includes(newIndex)) {
+                        count++;
+                    }
+                }
             }
         }
 
-        function adjustCellSize() {
-            const gameContainer = document.getElementById('game-container');
-            const availableWidth = gameContainer.clientWidth - 40; // 40px for padding
-            const cellSize = Math.floor(availableWidth / width);
-            cells.forEach(cell => {
-                cell.style.width = `${cellSize}px`;
-                cell.style.height = `${cellSize}px`;
-                cell.style.lineHeight = `${cellSize}px`;
-                cell.style.fontSize = `${Math.max(cellSize / 2, 12)}px`;
-            });
-        }
+        return count;
+    }
 
-        function placeMines() {
-            while (minePositions.length < mineCount) {
-                const position = Math.floor(Math.random() * (width * height));
-                if (!minePositions.includes(position)) {
-                    minePositions.push(position);
-                }
+    function revealCell(event) {
+
+        if (!gameStarted) return;
+        const cell = event.target;
+        const index = parseInt(cell.dataset.index);
+        
+        if (cell.classList.contains('revealed')) {
+            revealAdjacentIfFlagged(index);
+        } else {
+            revealSingleCell(cell);
+        }
+        console.log('revealCell')
+        
+        checkWin();  // 셀을 열 때마다 승리 조건을 확인합니다.
+    }
+
+    function checkWin() {
+        const revealedCount = cells.filter(cell => cell.classList.contains('revealed')).length;
+        const flaggedCount = cells.filter(cell => cell.textContent === '🚩').length;
+        const totalCells = width * height;
+
+        console.log('revealedCount: ', revealedCount);
+        console.log('totalCells: ', totalCells);
+        console.log('originalMineCount: ', originalMineCount);
+        console.log('flaggedCount: ', flaggedCount);
+
+        // 모든 안전한 셀이 열렸거나, 모든 지뢰에 정확히 깃발이 꽂혔을 때 승리
+        if (revealedCount === totalCells - originalMineCount || flaggedCount === originalMineCount) {
+            gameOver(true);
+            return true;
+        }
+        return false;
+    }
+
+
+    function flagCell(event) {
+        if (!gameStarted) return;
+        event.preventDefault();
+        const cell = event.target;
+
+        if (!cell.classList.contains('revealed')) {
+            if (cell.textContent === '🚩') {
+                cell.textContent = '';
+                mineCount++;
+            } else {
+                cell.textContent = '🚩';
+                mineCount--;
             }
             mineCountDisplay.textContent = `남은 지뢰: ${mineCount}`;
+            checkWin();  // 깃발을 꽂을 때마다 승리 조건을 확인합니다.
         }
+    }
 
-        function countAdjacentMines(index) {
-            const row = Math.floor(index / width);
-            const col = index % width;
-            let count = 0;
+    // function checkWin() {
+    //     const revealedCount = cells.filter(cell => cell.classList.contains('revealed')).length;
+    //     const flaggedMinesCount = cells.filter((cell, index) => 
+    //         minePositions.includes(index) && cell.textContent === '🚩'
+    //     ).length;
+        
+    //     if (revealedCount === width * height - mineCount || flaggedMinesCount === mineCount) {
+    //         gameOver(true);
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
-            for (let i = -1; i <= 1; i++) {
-                for (let j = -1; j <= 1; j++) {
-                    const newRow = row + i;
-                    const newCol = col + j;
-                    if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
-                        const newIndex = newRow * width + newCol;
-                        if (minePositions.includes(newIndex)) {
-                            count++;
-                        }
-                    }
-                }
-            }
-
-            return count;
-        }
-
-        function revealCell(event) {
-            if (!gameStarted) return;
-            const cell = event.target;
-            const index = parseInt(cell.dataset.index);
-            
-            if (cell.classList.contains('revealed') || cell.textContent === '🚩') {
-                return;
-            }
-
-            cell.classList.add('revealed');
-
+    function gameOver(isWin) {
+        gameStarted = false;
+        stopTimer();
+        cells.forEach((cell, index) => {
             if (minePositions.includes(index)) {
-                cell.textContent = '💣';
-                cell.style.backgroundColor = 'red';
-                gameOver(false);
-            } else {
-                const count = countAdjacentMines(index);
-                if (count === 0) {
-                    cell.textContent = '';
-                    revealAdjacentCells(index);
-                } else {
-                    cell.textContent = count;
-                    cell.style.color = getNumberColor(count);
-                }
-                checkWin();
-            }
-        }
-
-        function revealAdjacentCells(index) {
-            const row = Math.floor(index / width);
-            const col = index % width;
-
-            for (let i = -1; i <= 1; i++) {
-                for (let j = -1; j <= 1; j++) {
-                    const newRow = row + i;
-                    const newCol = col + j;
-                    if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
-                        const newIndex = newRow * width + newCol;
-                        const cell = cells[newIndex];
-                        if (!cell.classList.contains('revealed')) {
-                            revealCell({ target: cell });
-                        }
-                    }
-                }
-            }
-        }
-
-        function flagCell(event) {
-            if (!gameStarted) return;
-            event.preventDefault();
-            const cell = event.target;
-            
-            if (!cell.classList.contains('revealed')) {
-                if (cell.textContent === '🚩') {
-                    cell.textContent = '';
-                    mineCount++;
-                } else {
-                    cell.textContent = '🚩';
-                    mineCount--;
-                }
-                mineCountDisplay.textContent = `남은 지뢰: ${mineCount}`;
-            }
-        }
-
-        function gameOver(isWin) {
-            gameStarted = false;
-            stopTimer();
-            cells.forEach((cell, index) => {
-                if (minePositions.includes(index)) {
+                if (isWin) {
+                    cell.textContent = '💣';
+                    cell.style.backgroundColor = 'lightgreen';
+                } else if (cell.textContent !== '🚩') {
                     cell.textContent = '💣';
                 }
-                cell.removeEventListener('click', revealCell);
-                cell.removeEventListener('contextmenu', flagCell);
-            });
-            const status = isWin ? '승리!' : '게임 오버!';
-            const color = isWin ? 'green' : 'red';
+            } else if (cell.textContent === '🚩') {
+                cell.textContent = '❌';
+                cell.style.backgroundColor = 'pink';
+            }
+            cell.removeEventListener('click', revealCell);
+            cell.removeEventListener('contextmenu', flagCell);
+        });
+        
+        if (isWin) {
+            showVictoryMessage();
+        } else {
+            const status = '게임 오버!';
+            const color = 'red';
             mineCountDisplay.textContent = `${status} (${secondsElapsed}초)`;
             mineCountDisplay.style.color = color;
         }
+    }
 
-        function checkWin() {
-            const revealedCount = cells.filter(cell => cell.classList.contains('revealed')).length;
-            if (revealedCount === width * height - mineCount) {
-                gameOver(true);
+
+    function showVictoryMessage() {
+        const victoryMessage = document.getElementById('victory-message');
+        const finalTimeSpan = document.getElementById('final-time');
+        finalTimeSpan.textContent = secondsElapsed;
+        
+        victoryMessage.classList.remove('hidden');
+        setTimeout(() => {
+            victoryMessage.style.opacity = '1';
+            victoryMessage.querySelector('.content').style.transform = 'scale(1)';
+        }, 50);
+
+        createConfetti();
+    }
+
+    function createConfetti() {
+        const confettiCount = 200;
+        const container = document.body;
+        
+        for (let i = 0; i < confettiCount; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = getRandomColor();
+            confetti.style.position = 'fixed';
+            confetti.style.left = `${Math.random() * 100}%`;
+            confetti.style.top = '-10px';
+            confetti.style.animation = `confetti ${Math.random() * 3 + 2}s linear`;
+            container.appendChild(confetti);
+            
+            confetti.addEventListener('animationend', () => {
+                confetti.remove();
+            });
+        }
+    }
+
+    function getRandomColor() {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function revealAdjacentCells(index) {
+        const row = Math.floor(index / width);
+        const col = index % width;
+
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                const newRow = row + i;
+                const newCol = col + j;
+                if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                    const newIndex = newRow * width + newCol;
+                    const adjacentCell = cells[newIndex];
+                    if (!adjacentCell.classList.contains('revealed') && adjacentCell.textContent !== '🚩') {
+                        const count = countAdjacentMines(newIndex);
+                        adjacentCell.classList.add('revealed');
+                        if (count === 0) {
+                            adjacentCell.textContent = '';
+                            revealAdjacentCells(newIndex);
+                        } else {
+                            adjacentCell.textContent = count;
+                            adjacentCell.style.color = getNumberColor(count);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    function getNumberColor(num) {
+        const colors = ['#1976D2', '#388E3C', '#D32F2F', '#7B1FA2', '#FF8F00', '#0097A7', '#424242', '#9E9E9E'];
+        return colors[num - 1] || 'black';
+    }
+
+    function revealAdjacentIfFlagged(index) {
+        const row = Math.floor(index / width);
+        const col = index % width;
+        const cell = cells[index];
+        const adjacentFlagCount = countAdjacentFlags(index);
+        const adjacentMineCount = parseInt(cell.textContent);
+
+        if (adjacentFlagCount === adjacentMineCount) {
+            for (let i = -1; i <= 1; i++) {
+                for (let j = -1; j <= 1; j++) {
+                    const newRow = row + i;
+                    const newCol = col + j;
+                    if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                        const newIndex = newRow * width + newCol;
+                        const adjacentCell = cells[newIndex];
+                        if (!adjacentCell.classList.contains('revealed') && adjacentCell.textContent !== '🚩') {
+                            revealSingleCell(adjacentCell);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function countAdjacentFlags(index) {
+        const row = Math.floor(index / width);
+        const col = index % width;
+        let count = 0;
+
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                const newRow = row + i;
+                const newCol = col + j;
+                if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                    const newIndex = newRow * width + newCol;
+                    if (cells[newIndex].textContent === '🚩') {
+                        count++;
+                    }
+                }
             }
         }
 
-        function getNumberColor(num) {
-            const colors = ['#1976D2', '#388E3C', '#D32F2F', '#7B1FA2', '#FF8F00', '#0097A7', '#424242', '#9E9E9E'];
-            return colors[num - 1] || 'black';
+        return count;
+    }
+
+    function revealSingleCell(cell) {
+        const index = parseInt(cell.dataset.index);
+        if (cell.classList.contains('revealed') || cell.textContent === '🚩') {
+            return;
         }
 
-        // 초기 게임 설정
-        updateMineCount();
+        cell.classList.add('revealed');
 
-        // 화면 크기 변경 시 셀 크기 조정
-        window.addEventListener('resize', adjustCellSize);
-    </script>
+        if (minePositions.includes(index)) {
+            cell.textContent = '💣';
+            cell.style.backgroundColor = 'red';
+            gameOver(false);
+        } else {
+            const count = countAdjacentMines(index);
+            if (count === 0) {
+                cell.textContent = '';
+                revealEmptyAdjacentCells(index);
+            } else {
+                cell.textContent = count;
+                cell.style.color = getNumberColor(count);
+            }
+        }
+    }
+
+    function revealEmptyAdjacentCells(index) {
+        const row = Math.floor(index / width);
+        const col = index % width;
+
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                const newRow = row + i;
+                const newCol = col + j;
+                if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                    const newIndex = newRow * width + newCol;
+                    const adjacentCell = cells[newIndex];
+                    if (!adjacentCell.classList.contains('revealed') && adjacentCell.textContent !== '🚩') {
+                        revealSingleCell(adjacentCell);
+                    }
+                }
+            }
+        }
+    }
+
+    // 다시 시작 버튼 기능 추가
+    document.getElementById('restart-button').addEventListener('click', function() {
+        const victoryMessage = document.getElementById('victory-message');
+        victoryMessage.classList.add('hidden');
+        victoryMessage.style.opacity = '0';
+        victoryMessage.querySelector('.content').style.transform = 'scale(0.1)';
+        
+        // 게임 초기화 및 재시작
+        startGame();
+    });
+
+    // 초기 게임 설정
+    updateMineCount();
+
+    // 화면 크기 변경 시 셀 크기 조정
+    window.addEventListener('resize', adjustCellSize);
+</script>
 </body>
 </html>
